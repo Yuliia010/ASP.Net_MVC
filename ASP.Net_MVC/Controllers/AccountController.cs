@@ -47,7 +47,7 @@ namespace ASP.Net_MVC.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Login"); // login page
+                return RedirectToAction("Login", "Account"); // login page
             }
 
             foreach(var e in result.Errors)
@@ -104,6 +104,13 @@ namespace ASP.Net_MVC.Controllers
             return View(model);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
 
     }
 }

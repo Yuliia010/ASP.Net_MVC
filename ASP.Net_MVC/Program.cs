@@ -29,6 +29,18 @@ namespace ASP.Net_MVC
                 options.Lockout.MaxFailedAccessAttempts = 3; //  оличество попыток до блокировки
                 options.Lockout.AllowedForNewUsers = true; // –азрешена ли блокировка дл€ новых пользователей
             });
+
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";  
+                options.LogoutPath = "/Home/Index"; 
+                options.AccessDeniedPath = "/Home/Index"; 
+                options.ReturnUrlParameter = "returnUrl"; 
+            });
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

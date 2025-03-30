@@ -1,0 +1,54 @@
+﻿@model LoginViewModel
+
+@{
+}
+
+
+<div class="form-group">
+	<form asp-action="Login" method="post">
+		<div>
+			<label asp-for="Email" class="form-label"></label>
+			<input asp-for="Email" class="form-control" />
+			<span asp-validation-for="Email" class="text-danger"></span>
+		</div>
+
+		<div>
+			<label asp-for="Password" class="form-label"></label>
+			<input type="password" asp-for="Password" class="form-control" />
+			<span asp-validation-for="Password" class="text-danger"></span>
+		</div>
+
+		<button type="submit" class="custom-btn">Login </button>
+	</form>
+	<div asp-validation-summary="All" class="text-danger"></div>
+</div>
+
+
+
+
+<style>
+	.form-group {
+		width: 50%;
+		margin: 0 auto;
+		padding: 1rem;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.custom-btn {
+		display: block;
+		width: 100%;
+		margin: 20px 0 ;
+		padding: 10px;
+		background-color: palegreen;
+		border: 1px solid forestgreen;
+		border-radius: 5px;
+		text-align: center;
+		font: medium;
+	}
+
+		.custom-btn:hover {
+			background-color: forestgreen;
+		}
+</style>

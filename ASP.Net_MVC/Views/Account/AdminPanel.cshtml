@@ -1,0 +1,61 @@
+﻿@model List<UserInfoViewModel>
+
+@{
+    ViewData["Title"] = "User Manager";
+}
+
+<h2>Админ-панель</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>FullName</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.FullName</td>
+                <td>
+                    @if (user.Roles?.Count > 0)
+                    {
+                        @foreach (var role in user.Roles)
+                        {
+                            <span  >@role</span>
+                        }
+                    }
+                    else
+                    {
+                        <span >No roles</span>
+                    }
+                </td>
+                <td>
+                    @foreach (var role in new[] { "Admin", "User" })
+                    {
+                        <form method="post" asp-action="ChangeRole" asp-route-userId="@user.UserId" asp-route-role="@role">
+                            <button type="submit" class="btn btn-warning">
+                                @if (user.Roles.Contains(role))
+                                {
+                                    @:Remove @role
+                                }
+                                else
+                                {
+                                    @:Add @role
+                                }
+                            </button>
+                        </form>
+                    }
+
+                    <form method="post" asp-action="DeleteUser" asp-route-userId="@user.UserId">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

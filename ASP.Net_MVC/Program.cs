@@ -6,7 +6,7 @@ namespace ASP.Net_MVC
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -25,23 +25,29 @@ namespace ASP.Net_MVC
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); // Время блокировки (5 минут)
-                options.Lockout.MaxFailedAccessAttempts = 3; // Количество попыток до блокировки
-                options.Lockout.AllowedForNewUsers = true; // Разрешена ли блокировка для новых пользователей
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); 
+                options.Lockout.MaxFailedAccessAttempts = 3; 
+                options.Lockout.AllowedForNewUsers = true; 
             });
 
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Account/Login";  
-                options.LogoutPath = "/Home/Index"; 
-                options.AccessDeniedPath = "/Home/Index"; 
-                options.ReturnUrlParameter = "returnUrl"; 
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Home/Index";
+                options.AccessDeniedPath = "/Home/Index";
+                options.ReturnUrlParameter = "returnUrl";
             });
 
-
-
             var app = builder.Build();
+
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                await SeedRolesAndAdminAsync(services);
+            }
+
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -63,6 +69,42 @@ namespace ASP.Net_MVC
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
+        }
+
+        public static async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+
+            string[] roleNames = { "Admin", "User" };
+
+            foreach (var roleName in roleNames)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+
+            string adminEmail = "admin@test.com";
+            string adminPassword = "Admin123!";
+
+            var admin = await userManager.FindByEmailAsync(adminEmail);
+            if (admin == null)
+            {
+                var newAdmin = new AppUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    FullName = "Administrator"
+                };
+
+                var createAdmin = await userManager.CreateAsync(newAdmin, adminPassword);
+                if (createAdmin.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(newAdmin, "Admin");
+                }
+            }
         }
     }
 }
